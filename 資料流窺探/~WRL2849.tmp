@@ -1,0 +1,27 @@
+﻿資料來源（房市網站、API、CSV 等）
+     ↓
+ETL 程式（爬蟲/清洗/轉換）
+     ↓
+資料庫（MySQL / PostgreSQL / SQL Server / Azure SQL 等）
+     ↓
+Power BI 連接資料庫
+     ↓
+建立報表與儀表板
+     ↓
+自動排程（刷新資料與更新報表）
+
+
+
+🔍 模組解構與做法
+1️⃣ 資料取得（Data Ingestion）
+來源：
+• 政府開放資料（如實價登錄）
+• 房仲網頁爬蟲（591、樂居等）
+• API（若有提供）
+方式：
+• Python 爬蟲（如 BeautifulSoup、Scrapy）
+• 或直接下載定期更新的 CSV、Excel
+建議：
+• 使用排程工具如 cron 或 Windows Task Scheduler 執行每日爬取任務
+• 儲存原始資料檔案作為備份（Data Lake）
+
