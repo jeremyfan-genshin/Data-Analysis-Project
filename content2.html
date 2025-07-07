@@ -1,2 +1,225 @@
 <h2>內容二</h2>
 <p>這是第二個內容的 HTML。</p>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        pre {
+            white-space: pre-wrap;
+            /* 保留格式，但允許自動換行 */
+            word-wrap: break-word;
+            /* 長單字也換行 */
+        }
+    </style>
+    <style>
+        .collapsible {
+            transition: max-height 0.3s ease;
+            overflow: hidden;
+        }
+
+        .collapsed {
+            max-height: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+        }
+
+        .expanded {
+            max-height: 1500px;
+            /* 根據實際內容調整 */
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <ul>
+            <li><a href="#content1">資料蒐集</a></li>
+            <li><a href="#content2">資料庫寫入確認</a></li>
+        </ul>
+        <script>
+            console.log("這是測試用的 JavaScript 程式碼");
+        </script>
+        <article>
+            <h1>資料蒐集</h1>
+            <div id="content1" class="collapsible expanded">
+                ✅ 一、目標拆解與流程圖
+                🎯 目標：
+                自動從房市網站爬蟲 → 存入 MySQL → Power BI 定期更新 → 儀表板展示趨勢與統計
+
+                🔁 最簡資料流流程：
+
+                [Python爬蟲] → [MySQL資料庫] → [Power BI 資料來源連結] → [Power BI 自動排程更新] → [儀表板展示]
+                ✅ 二、最小實作步驟（MVP級）
+                1️⃣ Python 爬蟲：抓房市資料
+                建議網站來源：
+                591新建案 / 中古屋
+
+                實價登錄（內政部）
+
+                爬蟲設計：
+                抓取欄位（建議最少包含）：
+
+                地區 / 地址
+
+                總價 / 單價 / 坪數
+
+                格局 / 屋齡 / 社區名
+
+                日期（登錄日或發佈日）
+
+                requests + BeautifulSoup 或 Selenium（若有 JS 渲染）
+
+                2️⃣ 將資料存進 MySQL
+                設計資料表（建議命名：house_data）：
+
+                CREATE TABLE house_data (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                area VARCHAR(100),
+                address VARCHAR(255),
+                price INT,
+                unit_price FLOAT,
+                size FLOAT,
+                layout VARCHAR(50),
+                age FLOAT,
+                posted_date DATE,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                );
+                Python 連線 MySQL 推資料：
+
+                import pymysql
+
+                # 連線與 insert 範例
+                conn = pymysql.connect(...)
+                cursor = conn.cursor()
+                sql = "INSERT INTO house_data (area, address, price, unit_price, size, layout, age, posted_date) VALUES
+                (%s, %s, %s, %s, %s, %s, %s, %s)"
+                cursor.execute(sql, (area, address, price, unit_price, size, layout, age, date))
+                conn.commit()
+
+                3️⃣ Power BI 連接 MySQL 並建儀表板
+                開啟 Power BI Desktop，選擇「取得資料」 → 「MySQL 資料庫」
+
+                設定 MySQL 連線參數
+
+                使用 Power Query 建立基本轉換邏輯：
+
+                移除重複資料
+
+                將 posted_date 轉為月份，作為趨勢分析用
+
+                繪製：
+
+                價格趨勢折線圖
+
+                地區價格熱區地圖
+
+                格局分布圓餅圖
+
+                4️⃣ 自動化更新設計（依優先選擇）
+                ✅ 最精小可行方式（本機自動化）：
+                Python 定時排程（使用 schedule / Windows Task Scheduler / crontab）
+
+                每日自動跑爬蟲 & 寫入 MySQL
+
+                ✅ Power BI 自動刷新（需條件）：
+                如果使用 Power BI Pro + 雲端資料閘道（Data Gateway），可設定每日自動更新
+
+                或：透過 Power BI Service + On-Premise Gateway 安裝於本機，連接 MySQL
+
+                ✅ 三、時間與資源建議
+                階段 內容 預估時間
+                第一週 Python 爬蟲撰寫與測試 2–3 天
+                第二週 MySQL 建表與串接測試 1–2 天
+                第三週 Power BI 連線與製作儀表板 2–3 天
+                第四週 自動化排程設定 + 審查成果 1–2 天
+
+                ✅ 加值建議（進階後期可加入）
+                地圖分析（Power BI 的地圖視覺化）
+
+                推估行情（可結合簡單機器學習模型）
+
+                房型關聯分析
+
+                動態 URL 搜尋參數設計（針對不同地區）
+            </div>
+            <div id="content2">
+                批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。
+
+                ✅ 常見方式一：檢查資料庫回傳的結果 or 例外錯誤
+                1. 使用 executemany() 時，若寫入成功，通常：
+                不會丟出例外；
+
+                你可以查看 cursor.rowcount 表示受影響的筆數。
+
+                SQLite / MySQL 範例：
+                cursor.executemany("INSERT INTO users (name, age) VALUES (?, ?)", data_batch)
+
+                print(f"{cursor.rowcount} rows inserted.") # 應該等於 len(data_batch)
+                conn.commit()
+                若 rowcount 小於預期，代表有筆數可能沒成功寫入。
+
+                ✅ 常見方式二：查詢資料是否已存在
+                用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：
+                cursor.execute("SELECT COUNT(*) FROM users WHERE name IN ('Alice', 'Bob', 'Charlie')")
+                count = cursor.fetchone()[0]
+                print(f"確認寫入成功筆數: {count}")
+                ✅ 常見方式三：使用交易（transaction）機制保障一致性
+                Python DB 操作基本都支援交易：
+                try:
+                cursor.executemany(sql, data_batch)
+                conn.commit() # 一次提交，沒錯才寫入
+                except Exception as e:
+                conn.rollback() # 發生錯誤全部回復
+                print("寫入失敗，已回復:", e)
+                這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。
+
+                ✅ 常見方式四：寫入後讀回確認（對重要資料）
+                如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：
+
+                cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 3")
+                for row in cursor.fetchall():
+                print(row)
+                ✅ 若使用 pandas.to_sql()，如何確認？
+                df.to_sql('users', con=engine, if_exists='append', index=False)
+
+                # 寫入後再次查詢行數或特定值
+                with engine.connect() as conn:
+                result = conn.execute("SELECT COUNT(*) FROM users")
+                print(f"Total rows: {result.scalar()}")
+                ✅ 補充：寫入日誌 / Log 是好習慣
+                你可以在每次批次寫入時記錄：
+
+                print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
+                或寫入一個 log 檔案中，方便日後追蹤。
+
+                🔒 小結 — 如何確認批次寫入成功？
+                方法 說明
+                cursor.rowcount 查看成功影響筆數
+                查詢寫入結果 用 SELECT 驗證是否真的寫入
+                try/except + commit 發生錯誤就 rollback，保證一致性
+                交易控制（transaction） 確保批次寫入的原子性
+                日誌或 log 紀錄 保留紀錄，方便除錯
+            </div>
+        </article>
+    </main>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleLink = document.querySelector('a[href="#content1"]');
+        const content1 = document.getElementById("content1");
+
+        toggleLink.addEventListener("click", function (e) {
+            e.preventDefault(); // 防止跳轉錨點造成畫面抖動
+
+            content1.classList.toggle("collapsed");
+            content1.classList.toggle("expanded");
+        });
+    });
+</script>
+
+</html>

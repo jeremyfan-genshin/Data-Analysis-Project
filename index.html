@@ -8,139 +8,17 @@
   <title>大台中房市分析</title>
   <!-- 字體：溫潤田園風格 -->
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Merriweather', 'Noto Serif TC', serif;
-      background-color: #fdfaf5;
-      color: #5a4e3c;
-      line-height: 1.8;
-    }
-
-    header {
-      background-color: #a2c579;
-      color: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(120, 120, 120, 0.2);
-    }
-
-    header h1 {
-      margin-bottom: 10px;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 15px;
-    }
-
-    nav ul li a {
-      color: #fff;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    nav ul li a:hover {
-      text-decoration: underline;
-    }
-
-    .breadcrumb {
-      background-color: #f0ebdf;
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #856c4b;
-    }
-
-    .container {
-      display: flex;
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    main {
-      flex: 3;
-      margin-right: 20px;
-      background-color: #fffef9;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 6px rgba(150, 150, 150, 0.15);
-    }
-
-    article h2 {
-      margin-bottom: 10px;
-      color: #a95f2b;
-    }
-
-    aside {
-      flex: 1;
-    }
-
-    aside section {
-      background-color: #fffaf0;
-      border-left: 5px solid #c5aa6a;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      padding: 15px;
-      box-shadow: 0 0 5px rgba(200, 180, 140, 0.1);
-    }
-
-    aside h3 {
-      margin-bottom: 10px;
-      color: #8c6e4c;
-    }
-
-    a {
-      color: #a95f2b;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    footer {
-      background-color: #a2c579;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      margin-top: 40px;
-    }
-
-    footer a {
-      color: #fff;
-      margin: 0 10px;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-
-      main {
-        margin-right: 0;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
 <header>
-  <h1>大台中房市分析</h1>
+  <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">大台中房市分析</a></h1>
+  <!-- <h1>大台中房市分析</h1> -->
   <nav>
-    <ul>
-      <li><a href="#">首頁</a></li>
+    <ul>      
+      <li><a href="#" onclick="loadContent('home.html', '')">首頁</a></li>
       <li><a href="#">分類</a></li>
       <li><a href="#">專題發想</a></li>
       <li><a href="#">專題成員</a></li>
@@ -157,7 +35,7 @@
     <div class="content-area" id="content">
       <h2>大台中房市分析主頁</h2>
       <p>請從右邊選擇一個項目來顯示內容。</p>
-    </div>      
+    </div>
     <!-- <article>
       <h2>如何使用 JavaScript 操作 DOM？</h2>
       <p>本文將介紹如何使用 JavaScript 操作網頁上的 HTML 元素，包括選取、修改內容、增加事件等基本技巧。</p>
@@ -186,23 +64,23 @@
             <li class="parent">
               <span class="toggle">資料蒐集</span>
               <ul>
-                <li><a href="#" onclick="loadContent('content1.html', '資料蒐集 > 時價登陸')">內容一-1</a></li>
-                <li><a href="#" onclick="loadContent('content2.html', '資料蒐集 > 成交紀錄')">內容一-2</a></li>
+                <li><a href="#" onclick="loadContent('content1.html', '資料蒐集 > 實作地圖')">實作地圖</a></li>
+                <li><a href="#" onclick="loadContent('content2.html', '資料蒐集 > 成交紀錄')">成交紀錄</a></li>
               </ul>
             </li>
             <li class="parent">
               <span class="toggle">閱讀心得</span>
               <ul>
-                <li><a href="#" onclick="loadContent('content3.html', '閱讀心得 > 資料治理')">內容二-1</a></li>
-                <li><a href="#" onclick="loadContent('content4.html', '閱讀心得 > 資料工程')">內容二-2</a></li>
+                <li><a href="#" onclick="loadContent('content3.html', '閱讀心得 > 資料治理')">資料治理</a></li>
+                <li><a href="#" onclick="loadContent('content4.html', '閱讀心得 > 資料工程')">資料工程</a></li>
               </ul>
             </li>
             <li><a href="#" onclick="loadContent('content5.html', '單一項目')">單一項目</a></li>
             <li class="parent">
               <span class="toggle">分析圖表</span>
               <ul>
-                <li><a href="#" onclick="loadContent('content6.html', '分析圖表 > 分析圖表-1')">內容三-1</a></li>
-                <li><a href="#" onclick="loadContent('content7.html', '分析圖表 > 分析圖表-2')">內容三-2</a></li>
+                <li><a href="#" onclick="loadContent('content6.html', '分析圖表 > 分析圖表-1')">分析圖表-1</a></li>
+                <li><a href="#" onclick="loadContent('content7.html', '分析圖表 > 分析圖表-2')">分析圖表-2</a></li>
               </ul>
             </li>
           </ul>
@@ -211,7 +89,8 @@
     </section>
   </aside>
 </div>
-
+<!-- 回到 Top 的按鈕 -->
+<button id="backToTop">回到頂部</button>  
 <footer>
   <p>© 2025 資料分析團隊 | <a href="#">隱私政策</a></p>
   <p>
@@ -237,6 +116,16 @@
     .then(html => {
       document.getElementById('content').innerHTML = html;
       updateBreadcrumb(breadcrumbPath);
+
+      // // ✅ 新增這段：動態綁定折疊功能
+      // const toggleLink = document.querySelector('a[href="#content1"]');
+      // const targetDiv = document.getElementById("content1");
+      // if (toggleLink && targetDiv) {
+      //   toggleLink.addEventListener("click", function (e) {
+      //     e.preventDefault(); // 阻止預設跳錨點
+      //     targetDiv.style.display = (targetDiv.style.display === "none") ? "block" : "none";
+      //   });
+      // }      
     })
     .catch(error => {
       document.getElementById('content').innerHTML = "<p>無法載入內容。</p>";
@@ -255,6 +144,28 @@
       }).join(' &gt; ');
     }
   }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const backToTopBtn = document.getElementById("backToTop");
+
+        window.addEventListener("scroll", () => {
+        if (window.scrollY > 500) {
+            backToTopBtn.style.display = "block";
+        } else {
+            backToTopBtn.style.display = "none";
+        }
+        });
+
+        backToTopBtn.addEventListener("click", () => {
+            console.log("回到頂部按鈕被點擊");
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    });
 </script>
 </body>
 </html>

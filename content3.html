@@ -1,2 +1,184 @@
-<h2>內容三</h2>
-<p>這裡是第三部分。</p>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>批次寫入後確認資料是否成功</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background: #fefefe;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 0.3rem;
+            color: #2e7d32;
+        }
+
+        h2 {
+            color: #388e3c;
+            margin-top: 1.4rem;
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        ul li::before {
+            content: "✅ ";
+            color: green;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: Consolas, monospace;
+            font-size: 0.95rem;
+            margin: 1rem 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            border: 1px solid #bbb;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #c8e6c9;
+        }
+
+        .emoji {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 0.3rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>批次寫入後確認「資料是否寫入成功」方法</h1>
+
+    <p>批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。</p>
+
+    <h2><span class="emoji">✅</span>常見方式一：檢查資料庫回傳的結果 or 例外錯誤</h2>
+    <p>1. 使用 <code>executemany()</code> 時，若寫入成功，通常：</p>
+    <ul>
+        <li>不會丟出例外；</li>
+        <li>你可以查看 <code>cursor.rowcount</code> 表示受影響的筆數。</li>
+    </ul>
+    <p>SQLite / MySQL 範例：</p>
+    <pre>
+cursor.executemany("INSERT INTO users (name, age) VALUES (?, ?)", data_batch)
+
+print(f"{cursor.rowcount} rows inserted.")  # 應該等於 len(data_batch)
+conn.commit()
+</pre>
+    <p>若 <code>rowcount</code> 小於預期，代表有筆數可能沒成功寫入。</p>
+
+    <h2><span class="emoji">✅</span>常見方式二：查詢資料是否已存在</h2>
+    <p>用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：</p>
+    <pre>
+cursor.execute("SELECT COUNT(*) FROM users WHERE name IN ('Alice', 'Bob', 'Charlie')")
+count = cursor.fetchone()[0]
+print(f"確認寫入成功筆數: {count}")
+</pre>
+
+    <h2><span class="emoji">✅</span>常見方式三：使用交易（transaction）機制保障一致性</h2>
+    <p>Python DB 操作基本都支援交易：</p>
+    <pre>
+try:
+    cursor.executemany(sql, data_batch)
+    conn.commit()  # 一次提交，沒錯才寫入
+except Exception as e:
+    conn.rollback()  # 發生錯誤全部回復
+    print("寫入失敗，已回復:", e)
+</pre>
+    <p>這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。</p>
+
+    <h2><span class="emoji">✅</span>常見方式四：寫入後讀回確認（對重要資料）</h2>
+    <p>如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：</p>
+    <pre>
+cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 3")
+for row in cursor.fetchall():
+    print(row)
+</pre>
+
+    <h2><span class="emoji">✅</span>若使用 pandas.to_sql()，如何確認？</h2>
+    <pre>
+df.to_sql('users', con=engine, if_exists='append', index=False)
+
+# 寫入後再次查詢行數或特定值
+with engine.connect() as conn:
+    result = conn.execute("SELECT COUNT(*) FROM users")
+    print(f"Total rows: {result.scalar()}")
+</pre>
+
+    <h2><span class="emoji">✅</span>補充：寫入日誌 / Log 是好習慣</h2>
+    <p>你可以在每次批次寫入時記錄：</p>
+    <pre>
+print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
+</pre>
+    <p>或寫入一個 log 檔案中，方便日後追蹤。</p>
+
+    <h2><span class="emoji">🔒</span>小結 — 如何確認批次寫入成功？</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>方法</th>
+                <th>說明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>cursor.rowcount</code></td>
+                <td>查看成功影響筆數</td>
+            </tr>
+            <tr>
+                <td>查詢寫入結果</td>
+                <td>用 SELECT 驗證是否真的寫入</td>
+            </tr>
+            <tr>
+                <td>try/except + commit</td>
+                <td>發生錯誤就 rollback，保證一致性</td>
+            </tr>
+            <tr>
+                <td>交易控制（transaction）</td>
+                <td>確保批次寫入的原子性</td>
+            </tr>
+            <tr>
+                <td>日誌或 log 紀錄</td>
+                <td>保留紀錄，方便除錯</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>

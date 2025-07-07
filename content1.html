@@ -1,21 +1,248 @@
-<h2>內容一</h2>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p>
-<p>這是第一個內容的 HTML 檔案。</p> 
-<p>這是第一個內容的 HTML 檔案。</p>
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ 實作地圖</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">⭕ 批次寫入後確認「資料是否寫入成功」方法</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div id="content1" class="collapsible expanded">
+    <h1>實作地圖</h1>
+       
+    <div class="section">
+        <h2>一、目標拆解與流程圖</h2>
+        <p>目標：</p>
+        <p>自動從房市網站爬蟲 → 存入 MySQL → Power BI 定期更新 → 儀表板展示趨勢與統計</p>
+
+        <p>最簡資料流流程：</p>
+        <pre>[Python爬蟲] → [MySQL資料庫] → [Power BI 資料來源連結] → [Power BI 自動排程更新] → [儀表板展示]</pre>
+    </div>
+
+    <div class="section">
+        <h2> 二、最小實作步驟（MVP級）</h2>
+        <ol>
+            <li>
+                <strong>Python 爬蟲：抓房市資料</strong>
+                <p>建議網站來源：591新建案 / 中古屋，實價登錄（內政部）</p>
+                <p>爬蟲設計：</p>
+                <ul>
+                    <li>抓取欄位（建議最少包含）：</li>
+                </ul>
+                <p>地區 / 地址</p>
+                <p>總價 / 單價 / 坪數</p>
+                <p>格局 / 屋齡 / 社區名</p>
+                <p>日期（登錄日或發佈日）</p>
+                <p>requests + BeautifulSoup 或 Selenium（若有 JS 渲染）</p>
+            </li>
+
+            <li>
+                <strong>將資料存進 MySQL</strong>
+                <p>設計資料表（建議命名：house_data）：</p>
+                <pre>
+CREATE TABLE house_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    area VARCHAR(100),
+    address VARCHAR(255),
+    price INT,
+    unit_price FLOAT,
+    size FLOAT,
+    layout VARCHAR(50),
+    age FLOAT,
+    posted_date DATE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+                </pre>
+
+                <p>Python 連線 MySQL 推資料：</p>
+                <pre>
+import pymysql
+
+# 連線與 insert 範例
+conn = pymysql.connect(...)
+cursor = conn.cursor()
+sql = "INSERT INTO house_data (area, address, price, unit_price, size, layout, age, posted_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+cursor.execute(sql, (area, address, price, unit_price, size, layout, age, date))
+conn.commit()
+                </pre>
+            </li>
+
+            <li>
+                <strong>Power BI 連接 MySQL 並建儀表板</strong>
+                <p>開啟 Power BI Desktop，選擇「取得資料」 → 「MySQL 資料庫」</p>
+                <p>設定 MySQL 連線參數</p>
+                <p>使用 Power Query 建立基本轉換邏輯：</p>
+                <ul>
+                    <li>移除重複資料</li>
+                    <li>將 posted_date 轉為月份，作為趨勢分析用</li>
+                </ul>
+                <p>繪製：</p>
+                <ul>
+                    <li>價格趨勢折線圖</li>
+                    <li>地區價格熱區地圖</li>
+                    <li>格局分布圓餅圖</li>
+                </ul>
+            </li>
+
+            <li>
+                <strong>自動化更新設計（依優先選擇）</strong>
+                <ul>
+                    <li>最精小可行方式（本機自動化）：Python 定時排程（使用 schedule / Windows Task Scheduler / crontab）每日自動跑爬蟲 & 寫入 MySQL
+                    </li>
+                    <li>Power BI 自動刷新（需條件）：如果使用 Power BI Pro + 雲端資料閘道（Data Gateway），可設定每日自動更新；或透過 Power BI Service +
+                        On-Premise Gateway 安裝於本機，連接 MySQL</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>三、時間與資源建議</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>階段</th>
+                    <th>內容</th>
+                    <th>預估時間</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>第一週</td>
+                    <td>Python 爬蟲撰寫與測試</td>
+                    <td>2–3 天</td>
+                </tr>
+                <tr>
+                    <td>第二週</td>
+                    <td>MySQL 建表與串接測試</td>
+                    <td>1–2 天</td>
+                </tr>
+                <tr>
+                    <td>第三週</td>
+                    <td>Power BI 連線與製作儀表板</td>
+                    <td>2–3 天</td>
+                </tr>
+                <tr>
+                    <td>第四週</td>
+                    <td>自動化排程設定 + 審查成果</td>
+                    <td>1–2 天</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>加值建議（進階後期可加入）</h2>
+        <ul>
+            <li>地圖分析（Power BI 的地圖視覺化）</li>
+            <li>推估行情（可結合簡單機器學習模型）</li>
+            <li>房型關聯分析</li>
+            <li>動態 URL 搜尋參數設計（針對不同地區）</li>
+        </ul>
+    </div>
+</div>
+<div id="content2">
+    <h1>批次寫入後確認「資料是否寫入成功」方法</h1>
+
+    <p>批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。</p>
+
+    <h2>常見方式一：檢查資料庫回傳的結果 or 例外錯誤</h2>
+    <p>使用 <code>executemany()</code> 時，若寫入成功，通常：</p>
+    <ul>
+        <li>不會丟出例外；</li>
+        <li>你可以查看 <code>cursor.rowcount</code> 表示受影響的筆數。</li>
+    </ul>
+    <p>SQLite / MySQL 範例：</p>
+    <pre>
+cursor.executemany("INSERT INTO users (name, age) VALUES (?, ?)", data_batch)
+
+print(f"{cursor.rowcount} rows inserted.")  # 應該等於 len(data_batch)
+conn.commit()
+    </pre>
+    <p>若 <code>rowcount</code> 小於預期，代表有筆數可能沒成功寫入。</p>
+
+    <h2>常見方式二：查詢資料是否已存在</h2>
+    <p>用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：</p>
+    <pre>
+cursor.execute("SELECT COUNT(*) FROM users WHERE name IN ('Alice', 'Bob', 'Charlie')")
+count = cursor.fetchone()[0]
+print(f"確認寫入成功筆數: {count}")
+    </pre>
+
+    <h2 id = "start1">常見方式三：使用交易（transaction）機制保障一致性</h2>
+    <p>Python DB 操作基本都支援交易：</p>
+    <pre>
+try:
+cursor.executemany(sql, data_batch)
+conn.commit()  # 一次提交，沒錯才寫入
+except Exception as e:
+conn.rollback()  # 發生錯誤全部回復
+print("寫入失敗，已回復:", e)
+    </pre>
+    <p>這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。</p>
+
+    <h2>常見方式四：寫入後讀回確認（對重要資料）</h2>
+    <p>如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：</p>
+    <pre>
+cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 3")
+for row in cursor.fetchall():
+print(row)
+    </pre>
+
+    <h2>若使用 pandas.to_sql()，如何確認？</h2>
+    <pre>
+df.to_sql('users', con=engine, if_exists='append', index=False)
+
+# 寫入後再次查詢行數或特定值
+with engine.connect() as conn:
+result = conn.execute("SELECT COUNT(*) FROM users")
+print(f"Total rows: {result.scalar()}")
+    </pre>
+
+    <h2>補充：寫入日誌 / Log 是好習慣</h2>
+    <p>你可以在每次批次寫入時記錄：</p>
+    <pre>
+print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
+    </pre>
+    <p>或寫入一個 log 檔案中，方便日後追蹤。</p>
+
+    <h2>小結 — 如何確認批次寫入成功？</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>方法</th>
+                <th>說明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>cursor.rowcount</code></td>
+                <td>查看成功影響筆數</td>
+            </tr>
+            <tr>
+                <td>查詢寫入結果</td>
+                <td>用 SELECT 驗證是否真的寫入</td>
+            </tr>
+            <tr>
+                <td>try/except + commit</td>
+                <td>發生錯誤就 rollback，保證一致性</td>
+            </tr>
+            <tr>
+                <td>交易控制（transaction）</td>
+                <td>確保批次寫入的原子性</td>
+            </tr>
+            <tr>
+                <td>日誌或 log 紀錄</td>
+                <td>保留紀錄，方便除錯</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
