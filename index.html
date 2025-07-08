@@ -65,7 +65,7 @@
               <span class="toggle">資料蒐集</span>
               <ul>
                 <li><a href="#" onclick="loadContent('content1.html', '資料蒐集 > 實作地圖')">實作地圖</a></li>
-                <li><a href="#" onclick="loadContent('content2.html', '資料蒐集 > 成交紀錄')">成交紀錄</a></li>
+                <li><a href="#" onclick="loadContent('content2.html', '資料蒐集 > Power BI問與答')">Power BI問與答</a></li>
               </ul>
             </li>
             <li class="parent">
@@ -167,5 +167,22 @@
         });
     });
 </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch('home.html')
+        .then(response => {
+          if (!response.ok) throw new Error('載入失敗');
+          return response.text();
+        })
+        .then(html => {
+          document.getElementById('content').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('content').innerHTML = `<p>載入內容發生錯誤：${err.message}</p>`;
+          console.error(err);
+        });
+    });
+  </script>
 </body>
 </html>

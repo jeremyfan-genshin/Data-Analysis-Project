@@ -15,19 +15,20 @@
         </tbody>
     </table>
 </div>
-<div id="content1" class="collapsible expanded">
+<div id="content1">
     <h1>實作地圖</h1>
-       
-    <div class="section">
+
+    <section class="section">
         <h2>一、目標拆解與流程圖</h2>
         <p>目標：</p>
         <p>自動從房市網站爬蟲 → 存入 MySQL → Power BI 定期更新 → 儀表板展示趨勢與統計</p>
 
         <p>最簡資料流流程：</p>
         <pre>[Python爬蟲] → [MySQL資料庫] → [Power BI 資料來源連結] → [Power BI 自動排程更新] → [儀表板展示]</pre>
-    </div>
+        <hr>
+    </section>
 
-    <div class="section">
+    <section class="section">
         <h2> 二、最小實作步驟（MVP級）</h2>
         <ol>
             <li>
@@ -102,9 +103,10 @@ conn.commit()
                 </ul>
             </li>
         </ol>
-    </div>
+        <hr>
+    </section>
 
-    <div class="section">
+    <section class="section">
         <h2>三、時間與資源建議</h2>
         <table>
             <thead>
@@ -137,9 +139,9 @@ conn.commit()
                 </tr>
             </tbody>
         </table>
-    </div>
+    </section>
 
-    <div class="section">
+    <section class="section">
         <h2>加值建議（進階後期可加入）</h2>
         <ul>
             <li>地圖分析（Power BI 的地圖視覺化）</li>
@@ -147,102 +149,128 @@ conn.commit()
             <li>房型關聯分析</li>
             <li>動態 URL 搜尋參數設計（針對不同地區）</li>
         </ul>
-    </div>
+        <hr>
+    </section>
 </div>
 <div id="content2">
-    <h1>批次寫入後確認「資料是否寫入成功」方法</h1>
+    <section>
+        <h1>批次寫入後確認「資料是否寫入成功」方法</h1>
 
-    <p>批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。</p>
+        <p>批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。</p>
 
-    <h2>常見方式一：檢查資料庫回傳的結果 or 例外錯誤</h2>
-    <p>使用 <code>executemany()</code> 時，若寫入成功，通常：</p>
-    <ul>
-        <li>不會丟出例外；</li>
-        <li>你可以查看 <code>cursor.rowcount</code> 表示受影響的筆數。</li>
-    </ul>
-    <p>SQLite / MySQL 範例：</p>
-    <pre>
+        <h2>常見方式一：檢查資料庫回傳的結果 or 例外錯誤</h2>
+        <p>使用 <code>executemany()</code> 時，若寫入成功，通常：</p>
+        <ul>
+            <li>不會丟出例外；</li>
+            <li>你可以查看 <code>cursor.rowcount</code> 表示受影響的筆數。</li>
+        </ul>
+        <p>SQLite / MySQL 範例：</p>
+        <pre>
 cursor.executemany("INSERT INTO users (name, age) VALUES (?, ?)", data_batch)
 
 print(f"{cursor.rowcount} rows inserted.")  # 應該等於 len(data_batch)
 conn.commit()
     </pre>
-    <p>若 <code>rowcount</code> 小於預期，代表有筆數可能沒成功寫入。</p>
+        <p>若 <code>rowcount</code> 小於預期，代表有筆數可能沒成功寫入。</p>
+        <hr>
+    </section>
 
-    <h2>常見方式二：查詢資料是否已存在</h2>
-    <p>用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：</p>
-    <pre>
+    <section>
+        <h2>常見方式二：查詢資料是否已存在</h2>
+        <p>用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：</p>
+        <pre>
 cursor.execute("SELECT COUNT(*) FROM users WHERE name IN ('Alice', 'Bob', 'Charlie')")
 count = cursor.fetchone()[0]
 print(f"確認寫入成功筆數: {count}")
-    </pre>
+        </pre>
+        <hr>
+    </section>
 
-    <h2 id = "start1">常見方式三：使用交易（transaction）機制保障一致性</h2>
-    <p>Python DB 操作基本都支援交易：</p>
-    <pre>
+
+    <section>
+        <h2 id="start1">常見方式三：使用交易（transaction）機制保障一致性</h2>
+        <p>Python DB 操作基本都支援交易：</p>
+        <pre>
 try:
 cursor.executemany(sql, data_batch)
 conn.commit()  # 一次提交，沒錯才寫入
 except Exception as e:
 conn.rollback()  # 發生錯誤全部回復
 print("寫入失敗，已回復:", e)
-    </pre>
-    <p>這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。</p>
+        </pre>
+        <p>這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。</p>
+        <hr>
+    </section>
 
-    <h2>常見方式四：寫入後讀回確認（對重要資料）</h2>
-    <p>如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：</p>
-    <pre>
+
+    <section>
+        <h2>常見方式四：寫入後讀回確認（對重要資料）</h2>
+        <p>如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：</p>
+        <pre>
 cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 3")
 for row in cursor.fetchall():
 print(row)
-    </pre>
+        </pre>
+        <hr>
+    </section>
 
-    <h2>若使用 pandas.to_sql()，如何確認？</h2>
-    <pre>
+
+    <section>
+        <h2>若使用 pandas.to_sql()，如何確認？</h2>
+        <pre>
 df.to_sql('users', con=engine, if_exists='append', index=False)
 
 # 寫入後再次查詢行數或特定值
 with engine.connect() as conn:
 result = conn.execute("SELECT COUNT(*) FROM users")
 print(f"Total rows: {result.scalar()}")
-    </pre>
+        </pre>
+        <hr>
+    </section>
 
-    <h2>補充：寫入日誌 / Log 是好習慣</h2>
-    <p>你可以在每次批次寫入時記錄：</p>
-    <pre>
+
+    <section>
+        <h2>補充：寫入日誌 / Log 是好習慣</h2>
+        <p>你可以在每次批次寫入時記錄：</p>
+        <pre>
 print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
-    </pre>
-    <p>或寫入一個 log 檔案中，方便日後追蹤。</p>
+        </pre>
+        <p>或寫入一個 log 檔案中，方便日後追蹤。</p>
+        <hr>
+    </section>
 
-    <h2>小結 — 如何確認批次寫入成功？</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>方法</th>
-                <th>說明</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>cursor.rowcount</code></td>
-                <td>查看成功影響筆數</td>
-            </tr>
-            <tr>
-                <td>查詢寫入結果</td>
-                <td>用 SELECT 驗證是否真的寫入</td>
-            </tr>
-            <tr>
-                <td>try/except + commit</td>
-                <td>發生錯誤就 rollback，保證一致性</td>
-            </tr>
-            <tr>
-                <td>交易控制（transaction）</td>
-                <td>確保批次寫入的原子性</td>
-            </tr>
-            <tr>
-                <td>日誌或 log 紀錄</td>
-                <td>保留紀錄，方便除錯</td>
-            </tr>
-        </tbody>
-    </table>
+
+    <section>
+        <h2>小結 — 如何確認批次寫入成功？</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>方法</th>
+                    <th>說明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>cursor.rowcount</code></td>
+                    <td>查看成功影響筆數</td>
+                </tr>
+                <tr>
+                    <td>查詢寫入結果</td>
+                    <td>用 SELECT 驗證是否真的寫入</td>
+                </tr>
+                <tr>
+                    <td>try/except + commit</td>
+                    <td>發生錯誤就 rollback，保證一致性</td>
+                </tr>
+                <tr>
+                    <td>交易控制（transaction）</td>
+                    <td>確保批次寫入的原子性</td>
+                </tr>
+                <tr>
+                    <td>日誌或 log 紀錄</td>
+                    <td>保留紀錄，方便除錯</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 </div>

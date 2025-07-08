@@ -1,225 +1,194 @@
-<h2>內容二</h2>
-<p>這是第二個內容的 HTML。</p>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        pre {
-            white-space: pre-wrap;
-            /* 保留格式，但允許自動換行 */
-            word-wrap: break-word;
-            /* 長單字也換行 */
-        }
-    </style>
-    <style>
-        .collapsible {
-            transition: max-height 0.3s ease;
-            overflow: hidden;
-        }
-
-        .collapsed {
-            max-height: 0;
-            padding: 0;
-            margin: 0;
-            opacity: 0;
-        }
-
-        .expanded {
-            max-height: 1500px;
-            /* 根據實際內容調整 */
-            opacity: 1;
-        }
-    </style>
-</head>
-
-<body>
-    <main>
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ 資料庫正規化</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">⭕ Power BI：將文字欄位編碼為數值</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div id="content1">
+    <section class="section">
+        <h1>資料庫正規化</h1>
+        <h2>1. 資料庫正規化（Database Normalization）</h2>
+        <p>
+            指的是資料建模階段，將資料拆成多個有邏輯關係的表（例如：把「客戶」、「訂單」拆開），目的是避免重複、提升效率與一致性。
+        </p>
+        <p><strong>例如：</strong><br>
+            一張表有多筆重複的「客戶名稱」：可抽出為「客戶表」，以 <code>CustomerID</code> 關聯回訂單表。</p>
+        <p>拆成 <strong>維度表</strong> 與 <strong>事實表</strong></p>
+        <p><strong>在 Power BI 中這種正規化通常是：</strong></p>
         <ul>
-            <li><a href="#content1">資料蒐集</a></li>
-            <li><a href="#content2">資料庫寫入確認</a></li>
+            <li>在 Power Query 中拆表（Group by + Merge）</li>
+            <li>或在資料來源前（如 SQL）先行正規化</li>
         </ul>
-        <script>
-            console.log("這是測試用的 JavaScript 程式碼");
-        </script>
-        <article>
-            <h1>資料蒐集</h1>
-            <div id="content1" class="collapsible expanded">
-                ✅ 一、目標拆解與流程圖
-                🎯 目標：
-                自動從房市網站爬蟲 → 存入 MySQL → Power BI 定期更新 → 儀表板展示趨勢與統計
+        <hr>
+    </section>
 
-                🔁 最簡資料流流程：
+    <section class="section">
+        <h2>2. 數值正規化（Numeric Normalization / 標準化）</h2>
+        <p>
+            是指把數值欄位標準化成某個範圍，比如：
+        </p>
+        <ul>
+            <li><strong>Min-Max 正規化：</strong>把數值轉成 0 到 1 之間<br>
+                <code>Normalized = (Value - Min) / (Max - Min)</code>
+            </li>
+            <li><strong>Z-score 標準化：</strong>常用於統計、ML 模型<br>
+                <code>Z = (X - Mean) / StdDev</code>
+            </li>
+        </ul>
+        <p><strong>在 Power BI 中，這可以用：</strong></p>
+        <ul>
+            <li>Power Query（M 語言）來加欄位運算</li>
+            <li>或在報表中用 DAX 寫計算欄位/度量值</li>
+        </ul>
+        <hr>
+    </section>
 
-                [Python爬蟲] → [MySQL資料庫] → [Power BI 資料來源連結] → [Power BI 自動排程更新] → [儀表板展示]
-                ✅ 二、最小實作步驟（MVP級）
-                1️⃣ Python 爬蟲：抓房市資料
-                建議網站來源：
-                591新建案 / 中古屋
+    <section class="section">
+        <h2>3. 文字正規化（Text Normalization）</h2>
+        <p>
+            像是去除多餘空白、轉小寫、清除符號等，可在 Power Query 中使用：
+        </p>
+        <pre><code>Text.Trim(Text.Lower([欄位名稱]))</code></pre>
+        <hr>
+    </section>
+</div>
+<div id="content2">
+    <h1>Power BI：將文字欄位編碼為數值</h1>
 
-                實價登錄（內政部）
+    <section class="section">
+        <h2>概念說明</h2>
+        <p>在 Power BI 或 Power Query 中，將某個「文字欄位」用對應的「數值」取代，是一種常見的 <strong>編碼（Encoding）</strong> 方法，尤其在：</p>
+        <ul>
+            <li>資料前處理</li>
+            <li>分類變數轉為數值（如做數據分析或機器學習）</li>
+        </ul>
+        <hr>
+    </section>
 
-                爬蟲設計：
-                抓取欄位（建議最少包含）：
+    <section class="section">
+        <h2>範例說明</h2>
+        <p>假設有一欄「顏色」如下：</p>
+        <table>
+            <tr>
+                <th>顏色</th>
+            </tr>
+            <tr>
+                <td>紅色</td>
+            </tr>
+            <tr>
+                <td>藍色</td>
+            </tr>
+            <tr>
+                <td>綠色</td>
+            </tr>
+        </table>
 
-                地區 / 地址
+        <p>您希望轉換為：</p>
+        <table>
+            <tr>
+                <th>顏色</th>
+                <th>顏色代碼</th>
+            </tr>
+            <tr>
+                <td>紅色</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>藍色</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>綠色</td>
+                <td>3</td>
+            </tr>
+        </table>
+    </section>
 
-                總價 / 單價 / 坪數
+    <section class="section">
+        <h2>方法一：使用 Power Query 條件邏輯</h2>
+        <ol>
+            <li>進入 Power Query 編輯器，選擇您的主表。</li>
+            <li>點選「<strong>新增資料欄</strong>」 > 「<strong>條件欄位</strong>」。</li>
+            <li>設定條件如下：</li>
+        </ol>
 
-                格局 / 屋齡 / 社區名
+        <ul>
+            <li>如果 顏色 = 紅色，則 1</li>
+            <li>如果 顏色 = 藍色，則 2</li>
+            <li>如果 顏色 = 綠色，則 3</li>
+        </ul>
 
-                日期（登錄日或發佈日）
+        <p><strong>結果：</strong>會產生一個名為「顏色代碼」的新欄位。</p>
 
-                requests + BeautifulSoup 或 Selenium（若有 JS 渲染）
+        <p><strong>生成的 M 語法如下：</strong></p>
+        <pre>
+= Table.AddColumn(原始表, "顏色代碼", each 
+    if [顏色] = "紅色" then 1 
+    else if [顏色] = "藍色" then 2 
+    else if [顏色] = "綠色" then 3 
+    else null)
+        </pre>
+        <hr>
+    </section>
 
-                2️⃣ 將資料存進 MySQL
-                設計資料表（建議命名：house_data）：
+    <section class="section">
+        <h2>方法二：建立對照表 + 合併查詢（推薦）</h2>
+        <p>若文字與數值對應較多，建議用「合併查詢」搭配「對照表」處理。</p>
 
-                CREATE TABLE house_data (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                area VARCHAR(100),
-                address VARCHAR(255),
-                price INT,
-                unit_price FLOAT,
-                size FLOAT,
-                layout VARCHAR(50),
-                age FLOAT,
-                posted_date DATE,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                );
-                Python 連線 MySQL 推資料：
+        <p><strong>對照表範例如下：</strong></p>
+        <table>
+            <tr>
+                <th>顏色</th>
+                <th>顏色代碼</th>
+            </tr>
+            <tr>
+                <td>紅色</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>藍色</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>綠色</td>
+                <td>3</td>
+            </tr>
+        </table>
 
-                import pymysql
+        <p><strong>步驟：</strong></p>
+        <ol>
+            <li>將對照表也載入到 Power BI。</li>
+            <li>在 Power Query 編輯器中，選擇主表，點選「合併查詢」。</li>
+            <li>以主表的「顏色」對應對照表的「顏色」。</li>
+            <li>合併後展開欄位，選擇「顏色代碼」。</li>
+        </ol>
+        <hr>
+    </section>
 
-                # 連線與 insert 範例
-                conn = pymysql.connect(...)
-                cursor = conn.cursor()
-                sql = "INSERT INTO house_data (area, address, price, unit_price, size, layout, age, posted_date) VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s)"
-                cursor.execute(sql, (area, address, price, unit_price, size, layout, age, date))
-                conn.commit()
-
-                3️⃣ Power BI 連接 MySQL 並建儀表板
-                開啟 Power BI Desktop，選擇「取得資料」 → 「MySQL 資料庫」
-
-                設定 MySQL 連線參數
-
-                使用 Power Query 建立基本轉換邏輯：
-
-                移除重複資料
-
-                將 posted_date 轉為月份，作為趨勢分析用
-
-                繪製：
-
-                價格趨勢折線圖
-
-                地區價格熱區地圖
-
-                格局分布圓餅圖
-
-                4️⃣ 自動化更新設計（依優先選擇）
-                ✅ 最精小可行方式（本機自動化）：
-                Python 定時排程（使用 schedule / Windows Task Scheduler / crontab）
-
-                每日自動跑爬蟲 & 寫入 MySQL
-
-                ✅ Power BI 自動刷新（需條件）：
-                如果使用 Power BI Pro + 雲端資料閘道（Data Gateway），可設定每日自動更新
-
-                或：透過 Power BI Service + On-Premise Gateway 安裝於本機，連接 MySQL
-
-                ✅ 三、時間與資源建議
-                階段 內容 預估時間
-                第一週 Python 爬蟲撰寫與測試 2–3 天
-                第二週 MySQL 建表與串接測試 1–2 天
-                第三週 Power BI 連線與製作儀表板 2–3 天
-                第四週 自動化排程設定 + 審查成果 1–2 天
-
-                ✅ 加值建議（進階後期可加入）
-                地圖分析（Power BI 的地圖視覺化）
-
-                推估行情（可結合簡單機器學習模型）
-
-                房型關聯分析
-
-                動態 URL 搜尋參數設計（針對不同地區）
-            </div>
-            <div id="content2">
-                批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。
-
-                ✅ 常見方式一：檢查資料庫回傳的結果 or 例外錯誤
-                1. 使用 executemany() 時，若寫入成功，通常：
-                不會丟出例外；
-
-                你可以查看 cursor.rowcount 表示受影響的筆數。
-
-                SQLite / MySQL 範例：
-                cursor.executemany("INSERT INTO users (name, age) VALUES (?, ?)", data_batch)
-
-                print(f"{cursor.rowcount} rows inserted.") # 應該等於 len(data_batch)
-                conn.commit()
-                若 rowcount 小於預期，代表有筆數可能沒成功寫入。
-
-                ✅ 常見方式二：查詢資料是否已存在
-                用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：
-                cursor.execute("SELECT COUNT(*) FROM users WHERE name IN ('Alice', 'Bob', 'Charlie')")
-                count = cursor.fetchone()[0]
-                print(f"確認寫入成功筆數: {count}")
-                ✅ 常見方式三：使用交易（transaction）機制保障一致性
-                Python DB 操作基本都支援交易：
-                try:
-                cursor.executemany(sql, data_batch)
-                conn.commit() # 一次提交，沒錯才寫入
-                except Exception as e:
-                conn.rollback() # 發生錯誤全部回復
-                print("寫入失敗，已回復:", e)
-                這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。
-
-                ✅ 常見方式四：寫入後讀回確認（對重要資料）
-                如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：
-
-                cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 3")
-                for row in cursor.fetchall():
-                print(row)
-                ✅ 若使用 pandas.to_sql()，如何確認？
-                df.to_sql('users', con=engine, if_exists='append', index=False)
-
-                # 寫入後再次查詢行數或特定值
-                with engine.connect() as conn:
-                result = conn.execute("SELECT COUNT(*) FROM users")
-                print(f"Total rows: {result.scalar()}")
-                ✅ 補充：寫入日誌 / Log 是好習慣
-                你可以在每次批次寫入時記錄：
-
-                print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
-                或寫入一個 log 檔案中，方便日後追蹤。
-
-                🔒 小結 — 如何確認批次寫入成功？
-                方法 說明
-                cursor.rowcount 查看成功影響筆數
-                查詢寫入結果 用 SELECT 驗證是否真的寫入
-                try/except + commit 發生錯誤就 rollback，保證一致性
-                交易控制（transaction） 確保批次寫入的原子性
-                日誌或 log 紀錄 保留紀錄，方便除錯
-            </div>
-        </article>
-    </main>
-</body>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggleLink = document.querySelector('a[href="#content1"]');
-        const content1 = document.getElementById("content1");
-
-        toggleLink.addEventListener("click", function (e) {
-            e.preventDefault(); // 防止跳轉錨點造成畫面抖動
-
-            content1.classList.toggle("collapsed");
-            content1.classList.toggle("expanded");
-        });
-    });
-</script>
-
-</html>
+    <section class="section">
+        <h2>小技巧：使用 DAX 實作（模型階段處理）</h2>
+        <p>如果要在 DAX 層級處理，也可以用 <code>SWITCH</code> 函數：</p>
+        <pre>
+顏色代碼 = 
+SWITCH(
+    TRUE(),
+    [顏色] = "紅色", 1,
+    [顏色] = "藍色", 2,
+    [顏色] = "綠色", 3,
+    BLANK()
+)
+        </pre>
+        <p><strong>建議：</strong>若可行，盡量在 Power Query 階段先完成轉換，模型會更乾淨且可維護性更高。</p>
+    </section>
+</div>
