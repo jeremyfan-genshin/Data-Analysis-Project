@@ -156,6 +156,9 @@
         white-space: pre-wrap;   /* 保留格式，但允許自動換行 */
         word-wrap: break-word;   /* 長單字也換行 */
     }
+    code {
+      font-size: 14px;
+    }    
 
     body {
         font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
@@ -246,7 +249,8 @@
     margin-right: 0.3rem;
   } */
   img {
-      width: 200px;
+      width: 80%;            /* 寬度為螢幕寬度的80% */
+      max-width: 200px;      /* 最大寬度不超過200px */      
       height: auto;
       border-radius: 10px;
       border: 1px solid #ddd;

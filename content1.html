@@ -12,6 +12,9 @@
             <tr>
                 <td><a href="#content2">⭕ 批次寫入後確認「資料是否寫入成功」方法</a></td>
             </tr>
+            <tr>
+                <td><a href="#content3">⭕ Python 資料匯入資料庫流程說明</a></td>
+            </tr>
         </tbody>
     </table>
 </div>
@@ -273,4 +276,190 @@ print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
             </tbody>
         </table>
     </section>
+</div>
+<div id="content3">
+    <h1>Python 資料匯入流程說明</h1>
+
+    <section>
+        <h2>功能總覽</h2>
+        <ul>
+            <li><strong>資料庫初始化</strong></li>
+            <ul>
+                <li>連接 MySQL 資料庫（設定在 <code>db_config</code>）</li>
+                <li>建立 <code>housing</code> 表格（如果尚未存在），欄位有
+                    <code>id</code>、<code>address</code>、<code>price</code>、<code>area</code></li>
+            </ul>
+            <li><strong>CSV 檔案備份</strong></li>
+            <ul>
+                <li>每收到一筆新資料，就寫入本地 CSV (<code>housing_data.csv</code>) 作為備份</li>
+            </ul>
+            <li><strong>資料緩衝區與批次寫入 MySQL</strong></li>
+            <ul>
+                <li>使用 buffer 來暫存新資料</li>
+                <li>當 buffer 中資料達到 <code>BUFFER_LIMIT</code>（100 筆）時，批次寫入 MySQL，提高寫入效率</li>
+                <li>程式結束前會把剩下不足 100 筆的資料也寫入資料庫，避免遺漏</li>
+            </ul>
+            <li><strong>資料驗證</strong></li>
+            <ul>
+                <li>對資料中的 <code>price</code> 和 <code>area</code> 進行型態轉換與驗證，避免寫入錯誤格式</li>
+            </ul>
+            <li><strong>錯誤與狀態紀錄</strong></li>
+            <ul>
+                <li>透過 <code>logging</code> 模組寫入 <code>import_log.log</code>，記錄成功寫入與失敗回滾等事件</li>
+                <li>寫入失敗會印出錯誤訊息並執行資料庫回滾，確保資料完整性</li>
+            </ul>
+            <li><strong>模擬資料</strong></li>
+            <ul>
+                <li>主程式模擬 150 筆資料，產生地點、價格和面積</li>
+                <li>範例資料可替換成爬蟲或其他資料來源</li>
+            </ul>
+        </ul>
+    </section>
+
+    <section>
+        <h2>執行流程簡述</h2>
+        <ol>
+            <li>呼叫 <code>init_db()</code> 確保資料表存在</li>
+            <li>透過迴圈產生假資料</li>
+            <li>用 <code>validate_data()</code> 驗證資料格式</li>
+            <li>符合格式就呼叫 <code>process_new_data()</code>：
+                <ul>
+                    <li>寫入 CSV</li>
+                    <li>新資料加到緩衝區</li>
+                    <li>緩衝區滿時寫入 MySQL</li>
+                </ul>
+            </li>
+            <li>迴圈結束後，把緩衝區中剩餘的資料寫入 MySQL</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>適用場景</h2>
+        <ul>
+            <li>需要大量資料批次匯入 MySQL，並且希望有本地 CSV 備份</li>
+            <li>簡易錯誤處理與日誌紀錄</li>
+            <li>適合用於爬蟲資料後續儲存或批量資料匯入流程</li>
+        </ul>
+    </section>
+    <pre><code class="language-python">
+import csv
+import os
+import mysql.connector
+from mysql.connector import Error
+import logging
+
+# logging 日誌系統設定
+logging.basicConfig(
+    filename="import_log.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)   
+
+# MySQL 資料庫連線設定
+db_config = {
+    "host":"127.0.0.1",
+    "user":"dbuser2",
+    "password":"1234",
+    "autocommit":True,  # 自動提交事務
+    "port":3306,  # 如果需要指定端口
+    "charset":'utf8mb4',  # 如果需要指定字符集
+    "database":"housing"
+}
+
+# CSV 設定
+csv_file = "housing_data.csv"
+buffer = []
+BUFFER_LIMIT = 100
+
+# 建立表格（若不存在）
+def init_db(): 
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS housing (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                address VARCHAR(255),
+                price INT,
+                area FLOAT
+            )
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Error as e:
+        print("❌ 初始化資料庫失敗：", e)
+        logging.info("❌ 初始化資料庫失敗") 
+
+# 寫入 CSV（單筆）
+def write_to_csv(data, file_path):
+    file_exists = os.path.isfile(file_path)
+    with open(file_path, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=["address", "price", "area"])
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(data)
+
+def write_to_mysql_transaction(data_batch):
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        conn.start_transaction()
+
+        params = [(item["address"], item["price"], item["area"]) for item in data_batch]
+        cursor.executemany(
+            "INSERT INTO housing (address, price, area) VALUES (%s, %s, %s)",
+            params
+        )
+
+        conn.commit()
+        print(f"✅ 成功寫入 {len(data_batch)} 筆資料")
+        logging.info("✅ 成功寫入資料")     
+    except Error as e:
+        conn.rollback()
+        print("❌ 資料寫入失敗，已回滾")
+        logging.info("❌ 資料寫入失敗，已回滾")     
+        print("錯誤：", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# 新資料進來時的處理邏輯
+def process_new_data(new_data):
+    write_to_csv(new_data, csv_file)
+    buffer.append(new_data)
+    if len(buffer) >= BUFFER_LIMIT:
+        write_to_mysql_transaction(buffer.copy())
+        buffer.clear()
+
+# 增加欄位驗證或格式處理
+def validate_data(data):
+    try:
+        data["price"] = int(data["price"])
+        data["area"] = float(data["area"])
+        return True
+    except (ValueError, TypeError):
+        return False
+
+if __name__ == '__main__':
+    # 初始化資料表
+    init_db()
+
+    # 模擬資料進來（可替換成實際爬蟲）
+    for i in range(150):  # 假設有 250 筆資料
+        mock_data = {
+            "address": f"台北市大安區仁愛路{i}號",
+            "price": 1000 + i * 5,
+            "area": 30 + (i % 10)
+        }
+        if validate_data(mock_data):
+            process_new_data(mock_data)
+        else:
+            print("⚠️ 無效資料，略過：", mock_data)
+
+    if buffer:
+        write_to_mysql_transaction(buffer.copy())
+        buffer.clear()
+</code></pre>
 </div>

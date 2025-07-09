@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,163 +14,164 @@
 
 <body>
 
-<header>
-  <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">大台中房市分析</a></h1>
-  <!-- <h1>大台中房市分析</h1> -->
-  <nav>
-    <ul>      
-      <li><a href="#" onclick="loadContent('home.html', '')">首頁</a></li>
-      <li><a href="#">分類</a></li>
-      <li><a href="#">專題發想</a></li>
-      <li><a href="#">專題成員</a></li>
-    </ul>
-  </nav>
-</header>
+  <header>
+    <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">大台中房市分析</a></h1>
+    <!-- <h1>大台中房市分析</h1> -->
+    <nav>
+      <ul>
+        <li><a href="#" onclick="loadContent('home.html', '')">首頁</a></li>
+        <li><a href="#">分類</a></li>
+        <li><a href="#">專題發想</a></li>
+        <li><a href="#">專題成員</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<div class="breadcrumb" id="breadcrumb">
-  <span>首頁</span>
-</div>
+  <div class="breadcrumb" id="breadcrumb">
+    <span>首頁</span>
+  </div>
 
-<div class="container">
-  <main>
-    <div class="content-area" id="content">
-      <h2>大台中房市分析主頁</h2>
-      <p>請從右邊選擇一個項目來顯示內容。</p>
-    </div>
-    <!-- <article>
+  <div class="container">
+    <main>
+      <div class="content-area" id="content">
+        <h2>大台中房市分析主頁</h2>
+        <p>請從右邊選擇一個項目來顯示內容。</p>
+      </div>
+      <!-- <article>
       <h2>如何使用 JavaScript 操作 DOM？</h2>
       <p>本文將介紹如何使用 JavaScript 操作網頁上的 HTML 元素，包括選取、修改內容、增加事件等基本技巧。</p>
       <p>舉例：</p>
       <pre><code>document.querySelector("h1").textContent = "Hello World";</code></pre>
     </article> -->
-  </main>
+    </main>
 
-  <aside>
-    <section>
-      <h3>📌 最新文章</h3>
-      <ul>
-        <li><a href="#">資料籌備</a></li>
-        <li><a href="#">實作分享</a></li>
-        <li><a href="#">專題討論進程</a></li>
-      </ul>
-    </section>
-    <section>
-      <h3>🏷️ 標籤雲</h3>
-      <p># #前端 #CSS #教學</p>
-    </section>
-    <section>
-      <div class="index-area">        
-        <div class="tree">
-          <ul>
-            <li class="parent">
-              <span class="toggle">資料蒐集</span>
-              <ul>
-                <li><a href="#" onclick="loadContent('content1.html', '資料蒐集 > 實作地圖')">實作地圖</a></li>
-                <li><a href="#" onclick="loadContent('content2.html', '資料蒐集 > Power BI問與答')">Power BI Q&A</a></li>
-                <li><a href="#" onclick="loadContent('mysql.html', '資料蒐集 > MySQL問與答')">MySQL Q&A</a></li>
-                <li><a href="#" onclick="loadContent('git.html', '資料蒐集 > Git問與答')">Git Q&A</a></li>
-              </ul>
-            </li>
-            <li class="parent">
-              <span class="toggle">知識深化</span>
-              <ul>
-                <li><a href="#" onclick="loadContent('books.html', '知識深化 > 推薦書籍')">推薦書籍</a></li>
-                <li><a href="#" onclick="loadContent('content3.html', '知識深化 > 閱讀心得')">閱讀心得</a></li>
-                <li><a href="#" onclick="loadContent('content4.html', '知識深化 > 資料工程')">資料工程</a></li>
-              </ul>
-            </li>
-            <li><a href="#" onclick="loadContent('content5.html', '單一項目')">單一項目</a></li>
-            <li class="parent">
-              <span class="toggle">分析圖表</span>
-              <ul>
-                <li><a href="#" onclick="loadContent('content6.html', '分析圖表 > 分析圖表-1')">分析圖表-1</a></li>
-                <li><a href="#" onclick="loadContent('content7.html', '分析圖表 > 分析圖表-2')">分析圖表-2</a></li>
-              </ul>
-            </li>
-          </ul>
+    <aside>
+      <section>
+        <h3>📌 最新文章</h3>
+        <ul>
+          <li><a href="#">資料籌備</a></li>
+          <li><a href="#">實作分享</a></li>
+          <li><a href="#">專題討論進程</a></li>
+        </ul>
+      </section>
+      <section>
+        <h3>🏷️ 標籤雲</h3>
+        <p># #前端 #CSS #教學</p>
+      </section>
+      <section>
+        <div class="index-area">
+          <div class="tree">
+            <ul>
+              <li class="parent">
+                <span class="toggle">資料蒐集</span>
+                <ul>
+                  <li><a href="#" onclick="loadContent('content1.html', '資料蒐集 > 實作地圖')">實作地圖</a></li>
+                  <li><a href="#" onclick="loadContent('content2.html', '資料蒐集 > Power BI Q&A')">Power BI Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('mysql.html', '資料蒐集 > MySQL Q&A')">MySQL Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('git.html', '資料蒐集 > Git Q&A')">Git Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('python.html', '資料蒐集 > Python Q&A')">Python Q&A</a></li>
+                </ul>
+              </li>
+              <li class="parent">
+                <span class="toggle">知識深化</span>
+                <ul>
+                  <li><a href="#" onclick="loadContent('books.html', '知識深化 > 推薦書籍')">推薦書籍</a></li>
+                  <li><a href="#" onclick="loadContent('content3.html', '知識深化 > 閱讀心得')">閱讀心得</a></li>
+                  <li><a href="#" onclick="loadContent('content4.html', '知識深化 > 資料工程')">資料工程</a></li>
+                </ul>
+              </li>
+              <li><a href="#" onclick="loadContent('content5.html', '單一項目')">單一項目</a></li>
+              <li class="parent">
+                <span class="toggle">分析圖表</span>
+                <ul>
+                  <li><a href="#" onclick="loadContent('content6.html', '分析圖表 > 分析圖表-1')">分析圖表-1</a></li>
+                  <li><a href="#" onclick="loadContent('content7.html', '分析圖表 > 分析圖表-2')">分析圖表-2</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </section>
-  </aside>
-</div>
-<!-- 回到 Top 的按鈕 -->
-<button id="backToTop">回到頂部</button>  
-<footer>
-  <p>© 2025 資料分析團隊 | <a href="#">隱私政策</a></p>
-  <p>
-    <a href="#">Facebook</a> |
-    <a href="#">Instagram</a> |
-    <a href="#">GitHub</a>
-  </p>
-</footer>
+      </section>
+    </aside>
+  </div>
+  <!-- 回到 Top 的按鈕 -->
+  <button id="backToTop">回到頂部</button>
+  <footer>
+    <p>© 2025 資料分析團隊 | <a href="#">隱私政策</a></p>
+    <p>
+      <a href="#">Facebook</a> |
+      <a href="#">Instagram</a> |
+      <a href="#">GitHub</a>
+    </p>
+  </footer>
 
-<script>
-  document.querySelectorAll('.tree .toggle').forEach(function(toggle) {
-    toggle.addEventListener('click', function () {
-      this.parentElement.classList.toggle('open');
+  <script>
+    document.querySelectorAll('.tree .toggle').forEach(function (toggle) {
+      toggle.addEventListener('click', function () {
+        this.parentElement.classList.toggle('open');
+      });
     });
-  });
 
-  function loadContent(file, breadcrumbPath = '') {
-    fetch(file)
-    .then(response => {
-      if (!response.ok) throw new Error("載入失敗");
-      return response.text();
-    })
-    .then(html => {
-      document.getElementById('content').innerHTML = html;
-      updateBreadcrumb(breadcrumbPath);
+    function loadContent(file, breadcrumbPath = '') {
+      fetch(file)
+        .then(response => {
+          if (!response.ok) throw new Error("載入失敗");
+          return response.text();
+        })
+        .then(html => {
+          document.getElementById('content').innerHTML = html;
+          updateBreadcrumb(breadcrumbPath);
 
-      // // ✅ 新增這段：動態綁定折疊功能
-      // const toggleLink = document.querySelector('a[href="#content1"]');
-      // const targetDiv = document.getElementById("content1");
-      // if (toggleLink && targetDiv) {
-      //   toggleLink.addEventListener("click", function (e) {
-      //     e.preventDefault(); // 阻止預設跳錨點
-      //     targetDiv.style.display = (targetDiv.style.display === "none") ? "block" : "none";
-      //   });
-      // }      
-    })
-    .catch(error => {
-      document.getElementById('content').innerHTML = "<p>無法載入內容。</p>";
-      console.error(error);
-    });
-  }
-
-  function updateBreadcrumb(path) {
-    const container = document.getElementById('breadcrumb');
-    if (!path) {
-      container.innerHTML = '<span>首頁</span>';
-    } else {
-      const parts = path.split('>');
-      container.innerHTML = '<span>首頁</span> &gt; ' + parts.map((p, i) => {
-        return `<span class="${i === parts.length - 1 ? 'active' : ''}">${p.trim()}</span>`;
-      }).join(' &gt; ');
+          // // ✅ 新增這段：動態綁定折疊功能
+          // const toggleLink = document.querySelector('a[href="#content1"]');
+          // const targetDiv = document.getElementById("content1");
+          // if (toggleLink && targetDiv) {
+          //   toggleLink.addEventListener("click", function (e) {
+          //     e.preventDefault(); // 阻止預設跳錨點
+          //     targetDiv.style.display = (targetDiv.style.display === "none") ? "block" : "none";
+          //   });
+          // }      
+        })
+        .catch(error => {
+          document.getElementById('content').innerHTML = "<p>無法載入內容。</p>";
+          console.error(error);
+        });
     }
-  }
-</script>
 
-<script>
+    function updateBreadcrumb(path) {
+      const container = document.getElementById('breadcrumb');
+      if (!path) {
+        container.innerHTML = '<span>首頁</span>';
+      } else {
+        const parts = path.split('>');
+        container.innerHTML = '<span>首頁</span> &gt; ' + parts.map((p, i) => {
+          return `<span class="${i === parts.length - 1 ? 'active' : ''}">${p.trim()}</span>`;
+        }).join(' &gt; ');
+      }
+    }
+  </script>
+
+  <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const backToTopBtn = document.getElementById("backToTop");
+      const backToTopBtn = document.getElementById("backToTop");
 
-        window.addEventListener("scroll", () => {
+      window.addEventListener("scroll", () => {
         if (window.scrollY > 500) {
-            backToTopBtn.style.display = "block";
+          backToTopBtn.style.display = "block";
         } else {
-            backToTopBtn.style.display = "none";
+          backToTopBtn.style.display = "none";
         }
-        });
+      });
 
-        backToTopBtn.addEventListener("click", () => {
-            console.log("回到頂部按鈕被點擊");
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
+      backToTopBtn.addEventListener("click", () => {
+        console.log("回到頂部按鈕被點擊");
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
         });
+      });
     });
-</script>
+  </script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -188,4 +190,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -12,6 +12,9 @@
             <tr>
                 <td><a href="#content2">⭕ Power BI：將文字欄位編碼為數值</a></td>
             </tr>
+            <tr>
+                <td><a href="#content3">⭕ Power BI：多日期欄位分析建議</a></td>
+            </tr>
         </tbody>
     </table>
 </div>
@@ -191,4 +194,90 @@ SWITCH(
         </pre>
         <p><strong>建議：</strong>若可行，盡量在 Power Query 階段先完成轉換，模型會更乾淨且可維護性更高。</p>
     </section>
+</div>
+<div id="content3">
+    <h1>Power BI 多日期欄位分析建議</h1>
+
+    <p>你有一個 Fact Table（例如：訂單或交易資料），裡面有三個日期欄位：</p>
+    <ul>
+        <li>入住日期</li>
+        <li>退房日期</li>
+        <li>訂房日期</li>
+    </ul>
+
+    <p>並有一個獨立的 <strong>日期資料表（Date Table）</strong></p>
+
+    <h2>Power BI 限制</h2>
+    <p>每張表對同一個日期表只能有一個「實線」關聯（Active Relationship）。</p>
+
+    <h2>問題核心</h2>
+    <p>Power BI 只允許你在一個時間點使用一個「主關聯（實線）」來做計算。其他的關聯只能是「虛線（Inactive）」—— 這意味著你得自己控制「要用哪個日期」來做分析。</p>
+
+    <h2>建議解法：用 DAX 配合 USERELATIONSHIP</h2>
+    <p>在模型中：</p>
+    <ul>
+        <li>在 Fact Table 中，三個日期欄都與 Date Table 建立關聯</li>
+        <li>選擇其中一個（例如「入住日期」）作為「實線關聯」</li>
+        <li>其他兩個（退房、訂房）保持為「虛線關聯」</li>
+        <li>在 DAX 中動態選擇你要分析的日期</li>
+    </ul>
+
+    <h3>範例：</h3>
+
+    <p>以「入住日期」為主的計算（不需特別處理，因為是實線關聯）：</p>
+    <pre><code>入住人數 = COUNTROWS(FactTable)</code></pre>
+
+    <p>以「退房日期」為主的計算：</p>
+    <pre><code>退房人數 = 
+CALCULATE(
+    COUNTROWS(FactTable),
+    USERELATIONSHIP(FactTable[退房日期], DateTable[Date])
+)</code></pre>
+
+    <p>以「訂房日期」為主的計算：</p>
+    <pre><code>訂單數量 = 
+CALCULATE(
+    COUNTROWS(FactTable),
+    USERELATIONSHIP(FactTable[訂房日期], DateTable[Date])
+)</code></pre>
+
+    <h2>額外建議：建立一個切換維度的方式（進階）</h2>
+    <p>如果你想讓使用者自由選擇分析的日期類型（入住/退房/訂房），你可以這樣做：</p>
+
+    <p>建立一張日期類型維度表：</p>
+    <pre><code>日期類型 = DATATABLE("選擇", STRING, {{"入住日期"}, {"退房日期"}, {"訂房日期"}})</code></pre>
+
+    <p>加入一個切換欄位的 measure：</p>
+    <pre><code>彈性分析人數 =
+SWITCH(
+    SELECTEDVALUE('日期類型'[選擇]),
+    "入住日期", CALCULATE(COUNTROWS(FactTable)),
+    "退房日期", CALCULATE(COUNTROWS(FactTable), USERELATIONSHIP(FactTable[退房日期], DateTable[Date])),
+    "訂房日期", CALCULATE(COUNTROWS(FactTable), USERELATIONSHIP(FactTable[訂房日期], DateTable[Date]))
+)</code></pre>
+
+    <p>將 <strong>日期類型</strong> 放在報表的 slicer 供使用者選擇。</p>
+
+    <h2>總結</h2>
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>日期欄位</th>
+                <th>關聯狀態</th>
+                <th>使用方式</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>入住日期</td>
+                <td>實線（主關聯）</td>
+                <td>可直接用</td>
+            </tr>
+            <tr>
+                <td>退房/訂房日期</td>
+                <td>虛線（備用關聯）</td>
+                <td>用 USERELATIONSHIP() 啟用</td>
+            </tr>
+        </tbody>
+    </table>
 </div>

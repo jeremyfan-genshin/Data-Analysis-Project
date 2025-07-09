@@ -7,16 +7,19 @@
         </thead>
         <tbody>
             <tr>
-                <td><a href="#content1">⭕ Python 對 MySQL 建立資料庫</a></td>
+                <td><a href="#content1">⭕ Python: Python 對 MySQL 建立資料庫</a></td>
             </tr>
             <tr>
-                <td><a href="#content2">⭕ MySQL的users and Privileges設定</a></td>
+                <td><a href="#content2">⭕ MySQL: MySQL的users and Privileges設定</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content3">⭕ Python: 輸入資料欄位驗證或格式處理</a></td>
             </tr>
         </tbody>
     </table>
 </div>
 <div id="content1">
-    <h1>Python 對 MySQL 建立資料庫</h1>
+    <h1>Python: Python 對 MySQL 建立資料庫</h1>
     <h2>MySQL 端需要準備的事項：</h2>
     <ul>
         <li>已安裝 MySQL 伺服器（例如 MySQL Server 8.0）。</li>
@@ -68,7 +71,7 @@ conn.close()</code></pre>
 </div>
 
 <div id="content2">
-    <h1>MySQL的users and Privileges設定</h1>
+    <h1>MySQL: MySQL的users and Privileges設定</h1>
     <h2>1. Object Rights（物件權限）</h2>
     <div class="section">
         <p>是針對資料表（table）、檢視（view）、儲存程序（stored procedure）等具體物件的操作權限。例如對某個資料表 <code>employees</code> 可以授予以下權限：</p>
@@ -191,4 +194,40 @@ conn.close()</code></pre>
         </tbody>
     </table>
 
+</div>
+
+<div id="content3">
+    <h1>Python: 輸入資料欄位驗證或格式處理</h1>
+    <h2>函式說明：<code>validate_data</code></h2>
+
+    <div class="section">
+        <pre><code>def validate_data(data):
+    try:
+        data["price"] = int(data["price"])   # 嘗試把 "price" 轉換為整數
+        data["area"] = float(data["area"])   # 嘗試把 "area" 轉換為浮點數
+        return True                          # 如果兩個轉換都成功，回傳 True
+    except (ValueError, TypeError):          # 如果出現數值錯誤或型別錯誤
+        return False                         # 回傳 False，表示驗證失敗
+</code></pre>
+    </div>
+
+    <div class="section">
+        <h3>實際用途：</h3>
+        <p>這段程式碼通常用於處理來自表單、API 或其他輸入來源的資料，確保這些資料在存入資料庫或進一步處理之前具有正確的數值型態。</p>
+    </div>
+
+    <div class="section">
+        <h3>範例（成功）：</h3>
+        <pre><code>data = {"price": "1000", "area": "52.5"}
+print(validate_data(data))  # 輸出: True
+print(data)  # {"price": 1000, "area": 52.5}
+</code></pre>
+    </div>
+
+    <div class="section">
+        <h3>範例（失敗）：</h3>
+        <pre><code>data = {"price": "abc", "area": "52.5"}
+print(validate_data(data))  # 輸出: False
+</code></pre>
+    </div>
 </div>

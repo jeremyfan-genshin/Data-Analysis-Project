@@ -1,0 +1,215 @@
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ Python: Python logging 模組說明</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="content1">
+    <h1>Python: Python logging 模組說明</h1>
+    <p>Python 的 <code>logging</code> 模組是內建的日誌系統，用於將程式的運行資訊記錄下來（寫入檔案、終端機或其他輸出裝置）。</p>
+
+    <h2>為什麼使用 logging？</h2>
+    <p>相比 <code>print()</code>，logging 有以下優點：</p>
+    <ul>
+        <li>可設定 等級分類（debug/info/warning/error...）</li>
+        <li>可同時輸出到 檔案與終端機</li>
+        <li>可自訂輸出格式、時間、來源等</li>
+        <li>更方便 除錯、監控、維運</li>
+    </ul>
+
+    <h2>基本用法</h2>
+    <pre><code>import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+logging.debug("除錯訊息")
+logging.info("一般訊息")
+logging.warning("警告訊息")
+logging.error("錯誤訊息")
+logging.critical("致命錯誤")
+</code></pre>
+
+    <h2>日誌等級（從低到高）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>等級名稱</th>
+                <th>描述</th>
+                <th>常見用途</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>DEBUG</td>
+                <td>最詳細的日誌，用於除錯</td>
+                <td>除錯變數、邏輯判斷</td>
+            </tr>
+            <tr>
+                <td>INFO</td>
+                <td>一般資訊，如成功啟動、成功操作</td>
+                <td>程式流程紀錄、成功提示</td>
+            </tr>
+            <tr>
+                <td>WARNING</td>
+                <td>警告（非致命錯誤）</td>
+                <td>設定異常、重試</td>
+            </tr>
+            <tr>
+                <td>ERROR</td>
+                <td>錯誤（功能失敗）</td>
+                <td>資料庫連線失敗、API 回傳錯誤</td>
+            </tr>
+            <tr>
+                <td>CRITICAL</td>
+                <td>嚴重錯誤，導致程式可能中斷</td>
+                <td>伺服器崩潰、資源無法取得</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>設定 <code>level=logging.INFO</code>，表示會記錄 INFO 以上等級（INFO、WARNING、ERROR、CRITICAL）。</p>
+
+    <h2>格式說明 (format 參數)</h2>
+    <pre><code>format="%(asctime)s [%(levelname)s] %(message)s"</code></pre>
+    <table>
+        <thead>
+            <tr>
+                <th>格式碼</th>
+                <th>說明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>%(asctime)s</td>
+                <td>日誌的時間戳</td>
+            </tr>
+            <tr>
+                <td>%(levelname)s</td>
+                <td>日誌等級（INFO、ERROR 等）</td>
+            </tr>
+            <tr>
+                <td>%(message)s</td>
+                <td>訊息主體</td>
+            </tr>
+            <tr>
+                <td>%(filename)s</td>
+                <td>檔案名稱</td>
+            </tr>
+            <tr>
+                <td>%(lineno)d</td>
+                <td>行號</td>
+            </tr>
+            <tr>
+                <td>%(name)s</td>
+                <td>日誌記錄器名稱</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>寫入檔案範例</h2>
+    <pre><code>logging.basicConfig(
+    filename='app.log',
+    level=logging.WARNING,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+
+logging.warning("這是一個警告")
+logging.error("這是一個錯誤")
+</code></pre>
+    <p>會寫入到 <code>app.log</code> 檔案中。</p>
+
+    <h2>同時輸出到「終端機」與「檔案」</h2>
+    <pre><code>import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+# 檔案處理器
+file_handler = logging.FileHandler("logfile.log", encoding="utf-8")
+file_handler.setLevel(logging.INFO)
+
+# 終端機處理器
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+# 格式
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# 加入處理器
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+logger.info("這是一則 info 訊息")
+logger.debug("這是一則 debug 訊息")
+</code></pre>
+
+    <h2>補充小技巧</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>功能</th>
+                <th>用法範例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>限制檔案大小自動輪替</td>
+                <td>from logging.handlers import RotatingFileHandler</td>
+            </tr>
+            <tr>
+                <td>自訂 logger 名稱</td>
+                <td>logger = logging.getLogger("my_app")</td>
+            </tr>
+            <tr>
+                <td>記錄錯誤堆疊</td>
+                <td>logger.exception("錯誤發生")（在 except 中用）</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>測試執行</h2>
+    <pre><code>logging.basicConfig(level=logging.INFO)
+logging.info("開始匯入資料...")
+</code></pre>
+
+    <h2>總結</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>功能</th>
+                <th>logging 優點</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>控制等級</td>
+                <td>只記錄需要的訊息</td>
+            </tr>
+            <tr>
+                <td>自訂輸出</td>
+                <td>可調整格式、位置、來源檔案</td>
+            </tr>
+            <tr>
+                <td>擴充性高</td>
+                <td>可搭配檔案輪替、遠端 log server 等功能</td>
+            </tr>
+            <tr>
+                <td>程式整潔</td>
+                <td>比 print() 更好管理、可部署</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
