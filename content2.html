@@ -15,6 +15,18 @@
             <tr>
                 <td><a href="#content3">⭕ Power BI：多日期欄位分析建議</a></td>
             </tr>
+            <tr>
+                <td><a href="#content4">⭕ Power BI：DAX語法優化-IN</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content5">⭕ Power BI：DAX建立表格-使用ROW(動態)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content6">⭕ Power BI：DAX建立表格-使用SELECTCOLUMNS(靜態)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content7">⭕ Power BI：DAX建立表格-使用DATATABLE(靜態)</a></td>
+            </tr>
         </tbody>
     </table>
 </div>
@@ -280,4 +292,176 @@ SWITCH(
             </tr>
         </tbody>
     </table>
+</div>
+<div id="content4">
+    <h1>DAX語法優化-IN</h1>
+    <h3>原寫法：</h3>
+    <pre><code>VAR taoyuan_cnt = COUNTAX(
+    FILTER(
+        ALL(air_quality), 
+        air_quality[county] = "taoyuan city" && 
+        (air_quality[status] = "good" || air_quality[status] = "moderate")
+    ), 
+    air_quality[date]
+)</code></pre>
+
+    <h3>改成使用 IN 的寫法如下：</h3>
+    <pre><code>VAR taoyuan_cnt = COUNTAX(
+    FILTER(
+        ALL(air_quality), 
+        air_quality[county] = "taoyuan city" && 
+        air_quality[status] IN { "good", "moderate" }
+    ), 
+    air_quality[date]
+)</code></pre>
+
+    <h3>IN &#123; "good", "moderate" &#125; 的意思是：</h3>
+    <p>等同於 <code>(air_quality[status] = "good" || air_quality[status] = "moderate")</code>，但更簡潔易讀。</p>
+
+</div>
+<div id="content5">
+    <h1>Power BI：DAX建立表格-使用ROW(動態)</h1>
+    <h2>DAX 表格變數 <code>cnt_table</code> 說明</h2>
+
+    <p>這段 DAX 公式建立了一個新的表格變數 <code>cnt_table</code>，其目的是組合多個城市與各自對應的計算數值（通常是某種計數結果），形成一個結構化的表格。</p>
+
+    <h3>結構說明：</h3>
+
+    <pre><code>VAR cnt_table =
+    UNION(
+        ROW("city", "taipei city", "cnt", taipie_cnt),
+        ROW("city", "new taipei city", "cnt", new_taipei_cnt),
+        ROW("city", "taoyuan city", "cnt", taoyuan_cnt),
+        ROW("city", "taichung city", "cnt", taichung_cnt),
+        ROW("city", "tainan city", "cnt", tainan_cnt),
+        ROW("city", "kaohsiung city", "cnt", kaohsiung_cnt)
+    )</code></pre>
+
+    <h3>元素逐一說明：</h3>
+    <ul>
+        <li><strong>VAR cnt_table</strong>：定義一個變數，名稱是 <code>cnt_table</code>。</li>
+        <li><strong>ROW(...)</strong>：建立一列（row）資料，欄位名稱與值成對出現。<br>
+            例如：<code>ROW("city", "taipei city", "cnt", taipie_cnt)</code><br>
+            表示：城市為「taipei city」，其對應的統計值為 <code>taipie_cnt</code>
+        </li>
+        <li><strong>UNION(...)</strong>：將多個 <code>ROW</code> 結果合併為一個表格，行數增加。</li>
+    </ul>
+
+    <h3>最後形成的表格樣子如下（6 列 2 欄）：</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>city</th>
+                <th>cnt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>taipei city</td>
+                <td>taipie_cnt</td>
+            </tr>
+            <tr>
+                <td>new taipei city</td>
+                <td>new_taipei_cnt</td>
+            </tr>
+            <tr>
+                <td>taoyuan city</td>
+                <td>taoyuan_cnt</td>
+            </tr>
+            <tr>
+                <td>taichung city</td>
+                <td>taichung_cnt</td>
+            </tr>
+            <tr>
+                <td>tainan city</td>
+                <td>tainan_cnt</td>
+            </tr>
+            <tr>
+                <td>kaohsiung city</td>
+                <td>kaohsiung_cnt</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>註</strong>：這裡的 <code>taipie_cnt</code> 等應是你在前面定義的變數，例如經過 <code>COUNTAX</code> 或其他統計方式計算出來的數值。</p>
+
+    <h3>用途：</h3>
+    <ul>
+        <li>建立一個彙總表（summary table）供後續分析或視覺化</li>
+        <li>做為 <code>RETURN</code> 的結果，用於表格視覺化中顯示多個城市的統計比較</li>
+        <li>進一步做篩選、排序、加總等操作</li>
+    </ul>
+
+    <h3>輸出至視覺化：</h3>
+    <p>若你想把這個表格輸出給 Power BI 的表格視覺化使用，可以在公式中加入：</p>
+
+    <pre><code>RETURN
+    cnt_table</code></pre>
+</div>
+<div id="content6">
+    <h1>Power BI：DAX建立表格-使用SELECTCOLUMNS(靜態)</h1>
+    <h2>DAX 精簡寫法：<code>ROW + UNION</code> 的替代方案</h2>
+
+    <p><strong>在 DAX 中，<code>ROW + UNION</code> 是最簡潔的原生寫法之一。</strong></p>
+
+    <h3>可讀性上的微調（仍屬同類寫法）：</h3>
+    <p>你可以將欄位名稱提到外層，讓每列只寫值，看起來較整齊：</p>
+
+    <pre><code>VAR cnt_table =
+    SELECTCOLUMNS(
+        {
+            {"taipei city", taipie_cnt},
+            {"new taipei city", new_taipei_cnt},
+            {"taoyuan city", taoyuan_cnt},
+            {"taichung city", taichung_cnt},
+            {"tainan city", tainan_cnt},
+            {"kaohsiung city", kaohsiung_cnt}
+        },
+        "city", [Value1],
+        "cnt", [Value2]
+    )</code></pre>
+
+    <h3>解釋：</h3>
+    <ul>
+        <li><strong>SELECTCOLUMNS()</strong>：用來重新命名欄位</li>
+        <li>裡面的 <code>{ {...}, {...}, ... }</code> 是建立表格的寫法，<code>Value1</code> 和 <code>Value2</code> 是內部欄位名稱</li>
+        <li>這種寫法避免了重複撰寫欄位名稱 <code>"city"</code> 和 <code>"cnt"</code></li>
+    </ul>
+
+    <h3>優點：</h3>
+    <ul>
+        <li>更整齊、易讀</li>
+        <li>避免重複寫 <code>"city"</code> 和 <code>"cnt"</code> 六次</li>
+    </ul>
+
+    <h3>限制：</h3>
+    <ul>
+        <li>本質上還是手動建立表格，無法動態根據資料模型擴充城市數量</li>
+    </ul>
+
+    </body>
+
+    </html>
+</div>
+<div id="content7">
+    <h1>Power BI：DAX建立表格-使用DATATABLE(靜態)</h1>
+    <h2>用 DATATABLE 明確定義欄位</h2>
+
+    <pre><code class="language-dax">
+VAR cnt_table2 = 
+    DATATABLE(
+        "city", STRING,
+        "cnt", INTEGER,
+        {
+            {"taipei city", taipie_cnt},
+            {"new taipei city", new_taipei_cnt},
+            {"taoyuan city", taoyuan_cnt},
+            {"taichung city", taichung_cnt},
+            {"tainan city", tainan_cnt},
+            {"kaohsiung city", kaohsiung_cnt}
+        }
+    )
+</code></pre>
+    <p>DATATABLE 需要你明確指定欄位名稱與類型，這樣用 <code>[city]</code> 和 <code>[cnt]</code> 就不會有錯誤。</p>
 </div>
